@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: back-reservAR
+  datasource:
+    url: jdbc:postgresql://localhost:5433/reservar_db
+    username: reservar_user
+    password: 123456789
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  jackson:
+    time-zone: UTC
+    serialization:
+      write-dates-as-timestamps: false
+
+jwt:
+  secret: JB46vDu8MzAJh0s+HEmj2EtegRs/EJJ1i9EVP48j6Hc=
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DiffGenerationConfig">
+    <option name="snapshotDb" value="false" />
+    <option name="snapshotModelValue" value="back-reservAr:back-reservAr" />
+    <option name="sourceModelValue" value="back-reservAr:back-reservAr" />
+    <option name="targetDbValue" value="dd9dd89f-c841-447c-b740-414e6dd2b371" />
+  </component>
+</project>
