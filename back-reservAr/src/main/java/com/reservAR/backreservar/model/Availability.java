@@ -3,6 +3,7 @@ package com.reservAR.backreservar.model;
 import com.reservAR.backreservar.exception.AvailabilityException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.time.LocalTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "restaurant_availability", uniqueConstraints = @UniqueConstraint(columnNames = {"resturant_id" ,"day_of_week"}))
 public class Availability {
 

@@ -44,7 +44,7 @@ public class UserService implements IUserService {
                 .name(user.name())
                 .surname(user.surname())
                 .phone(user.phone())
-                .role(Role.COSTUMER)
+                .role(Role.CUSTOMER)
                 .build();
 
         return userRepository.save(newUser);
