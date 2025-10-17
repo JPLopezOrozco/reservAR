@@ -26,9 +26,9 @@ public class Availability {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private DayOfWeek dayOfWeek;
-    @Column(nullable = false)
+    @Column(nullable = false, name = "start_time")
     private LocalTime start;
-    @Column(nullable = false)
+    @Column(nullable = false, name = "end_time")
     private LocalTime end;
 
 

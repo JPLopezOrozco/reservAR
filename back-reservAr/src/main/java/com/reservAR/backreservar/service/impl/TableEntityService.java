@@ -63,6 +63,6 @@ public class TableEntityService implements ITableEntityService {
     public void deleteById(Long id) {
         TableEntity tableEntity = tableEntityRepository.findById(id)
                 .orElseThrow(()-> new TableNotFoundException("Table not found"));
-        restaurantRepository.deleteById(id);
+        tableEntityRepository.delete(tableEntity);
     }
 }

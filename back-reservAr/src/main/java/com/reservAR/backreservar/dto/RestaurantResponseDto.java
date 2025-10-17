@@ -1,6 +1,5 @@
 package com.reservAR.backreservar.dto;
 
-import com.reservAR.backreservar.model.Availability;
 import com.reservAR.backreservar.model.Restaurant;
 
 import java.math.BigDecimal;
@@ -10,13 +9,14 @@ public record RestaurantResponseDto(
         String name,
         String address,
         String city,
-        List<Availability> availabilities,
+        List<AvailabilityResponseDto> availabilities,
         BigDecimal price
 ) {
     public static RestaurantResponseDto of(Restaurant restaurant) {
-        List<Availability> availabilities = restaurant.getAvailability()!= null ?
-                restaurant.getAvailability().stream().toList() :
-                null;
+        List<AvailabilityResponseDto> availabilities = restaurant.getAvailability()!= null ?
+                restaurant.getAvailability().stream()
+                        .map(AvailabilityResponseDto::of)
+                        .toList() : null;
 
         return new RestaurantResponseDto(
                 restaurant.getName(),
