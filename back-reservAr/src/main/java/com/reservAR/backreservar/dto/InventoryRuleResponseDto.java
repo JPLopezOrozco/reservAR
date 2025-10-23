@@ -8,7 +8,7 @@ public record InventoryRuleResponseDto(
         int defaultDurationMin,
         int prepBufferMin,
         int cleanupBufferMin,
-        int slotGranularityMin
+        int gracePeriodMin
 ) {
     public static InventoryRuleResponseDto of(InventoryRule inventoryRule) {
         return new InventoryRuleResponseDto(
@@ -17,7 +17,7 @@ public record InventoryRuleResponseDto(
                 inventoryRule.getDefaultDurationMin(),
                 inventoryRule.getPrepBufferMin(),
                 inventoryRule.getCleanupBufferMin(),
-                inventoryRule.getSlotGranularityMin()
+                inventoryRule.getGracePeriodMin()
         );
     }
 }

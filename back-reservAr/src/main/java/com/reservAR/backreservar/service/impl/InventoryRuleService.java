@@ -30,7 +30,7 @@ public class InventoryRuleService implements IInventoryRuleService {
         if (inventoryRule.cleanupBufferMin() < 0
                 || inventoryRule.defaultDuration() < 0
                 || inventoryRule.prepBufferMin() < 0
-                || inventoryRule.slotGranularityMin() < 0
+                || inventoryRule.gracePeriodMin() < 0
         )
             throw new InventoryRuleException("Rule invalid");
         Restaurant restaurant = restaurantService.findById(inventoryRule.restaurantId());
@@ -39,7 +39,7 @@ public class InventoryRuleService implements IInventoryRuleService {
                 .defaultDurationMin(inventoryRule.defaultDuration())
                 .prepBufferMin(inventoryRule.prepBufferMin())
                 .cleanupBufferMin(inventoryRule.cleanupBufferMin())
-                .slotGranularityMin(inventoryRule.slotGranularityMin())
+                .gracePeriodMin(inventoryRule.gracePeriodMin())
                 .build();
 
         return inventoryRuleRepository.save(newInventoryRule);

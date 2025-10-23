@@ -1,16 +1,14 @@
 package com.reservAR.backreservar.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.List;
 
 @Entity
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,7 +24,9 @@ public class Reservation {
     private Restaurant restaurant;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+    @Column(name = "start_time")
     private Instant start;
+    @Column(name = "end_time")
     private Instant end;
     @Enumerated(EnumType.STRING)
     private Status status;

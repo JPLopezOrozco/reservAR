@@ -7,6 +7,6 @@ public record InventoryRuleRequestDto(
         @NotNull int defaultDuration,
         @NotNull int prepBufferMin,
         @NotNull int cleanupBufferMin,
-        @NotNull int slotGranularityMin
+        @NotNull int gracePeriodMin
 ) {
 }

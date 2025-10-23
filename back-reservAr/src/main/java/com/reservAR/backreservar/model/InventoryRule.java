@@ -23,12 +23,12 @@ public class InventoryRule {
     private int defaultDurationMin;
     private int prepBufferMin;
     private int cleanupBufferMin;
-    private int slotGranularityMin;
+    private int gracePeriodMin;
 
     @PrePersist
     @PreUpdate
     public void validate(){
-        if (prepBufferMin < 0 || defaultDurationMin < 0 || slotGranularityMin < 0 || cleanupBufferMin < 0) {
+        if (prepBufferMin < 0 || defaultDurationMin < 0 || gracePeriodMin < 0 || cleanupBufferMin < 0) {
             throw new InventoryRuleException("Time cannot be negative");
         }
     }
