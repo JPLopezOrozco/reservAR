@@ -1,62 +1,36 @@
 package com.reservAR.backreservar.controller;
 
-import com.mercadopago.MercadoPagoConfig;
-import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
-import com.mercadopago.client.preference.PreferenceClient;
-import com.mercadopago.client.preference.PreferenceItemRequest;
-import com.mercadopago.client.preference.PreferenceRequest;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
-import com.mercadopago.resources.preference.Preference;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.reservAR.backreservar.dto.PaymentDto;
+import com.reservAR.backreservar.service.IPaymentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/payment")
+@RequiredArgsConstructor
 public class PaymentController {
 
+    private final IPaymentService paymentService;
 
-    @GetMapping("/mercado")
-    public String mercado() throws MPException, MPApiException {
+    @PostMapping("/mercado-pago/{id}")
+    public ResponseEntity<String> mercado(@PathVariable Long id) throws MPException, MPApiException {
+        return ResponseEntity.ok(paymentService.paymentReservation(id));
+    }
 
-        MercadoPagoConfig.setAccessToken("APP_USR-5631774668529393-102316-efa56a3acc039021ad8a03ca7f229df7-2943677250");
 
-        PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                        .success("https://www.tu-sitio/success")
-                        .pending("https://www.tu-sitio/pending")
-                        .failure("https://www.tu-sitio/failure")
-                        .build();
+    @PostMapping("/mercado-pago/webhook")
+    public ResponseEntity<String> handleWebhook(@RequestBody(required = false)Map<String, Object> body,
+                                                @RequestHeader Map<String, Object> headers,
+                                                @RequestParam(required = false) Map<String, String> params)
+            throws MPException, MPApiException {
+        paymentService.processPayment(body, headers, params);
 
-        PreferenceItemRequest itemRequest =
-                PreferenceItemRequest.builder()
-                        .id("1234")
-                        .title("Games")
-                        .description("PS5")
-                        .pictureUrl("http://picture.com/PS5")
-                        .categoryId("games")
-                        .quantity(2)
-                        .currencyId("ARS")
-                        .unitPrice(new BigDecimal("4000"))
-                        .build();
-
-        List<PreferenceItemRequest> items = new ArrayList<>();
-
-        items.add(itemRequest);
-
-        PreferenceRequest preferenceRequest = PreferenceRequest.builder()
-                .items(items)
-                .backUrls(backUrls)
-                .build();
-
-        PreferenceClient client = new PreferenceClient();
-
-        Preference preference = client.create(preferenceRequest);
-
-        return preference.getSandboxInitPoint();
+        return ResponseEntity.ok().body("Ok");
     }
 }

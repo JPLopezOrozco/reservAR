@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "restaurant_availability", uniqueConstraints = @UniqueConstraint(columnNames = {"resturant_id" ,"day_of_week"}))
+@Table(name = "restaurant_availability", uniqueConstraints = @UniqueConstraint(columnNames = {"restaurant_id" ,"day_of_week"}))
 public class Availability {
 
     @Id

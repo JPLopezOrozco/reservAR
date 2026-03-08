@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record RestaurantResponseDto(
+        Long id,
         String name,
         String address,
         String city,
@@ -19,6 +20,7 @@ public record RestaurantResponseDto(
                         .toList() : null;
 
         return new RestaurantResponseDto(
+                restaurant.getId(),
                 restaurant.getName(),
                 restaurant.getAddress(),
                 restaurant.getCity(),

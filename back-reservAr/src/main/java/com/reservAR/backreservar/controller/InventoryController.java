@@ -4,6 +4,7 @@ import com.reservAR.backreservar.dto.InventoryRuleRequestDto;
 import com.reservAR.backreservar.dto.InventoryRuleResponseDto;
 import com.reservAR.backreservar.model.InventoryRule;
 import com.reservAR.backreservar.service.IInventoryRuleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class InventoryController {
     }
 
     @PostMapping
-    public ResponseEntity<InventoryRuleResponseDto> create(@RequestBody InventoryRuleRequestDto ruleRequestDto){
+    public ResponseEntity<InventoryRuleResponseDto> create(@RequestBody @Valid InventoryRuleRequestDto ruleRequestDto){
         InventoryRule inventoryRule = inventoryRuleService.save(ruleRequestDto);
         var location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

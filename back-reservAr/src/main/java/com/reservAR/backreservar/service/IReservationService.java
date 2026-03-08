@@ -8,7 +8,7 @@ import java.util.List;
 public interface IReservationService {
     Reservation findById(Long id);
     Reservation save(ReservationRequestDto reservation);
-    List<Reservation> findByUser(Long id);
+    List<Reservation> findByUser(String username);
     Reservation cancelReservation(Long id);
     Reservation completeReservation(Long id);
     void expiredReservation();

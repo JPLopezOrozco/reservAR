@@ -4,6 +4,7 @@ import com.reservAR.backreservar.dto.TableRequestDto;
 import com.reservAR.backreservar.dto.TableResponseDto;
 import com.reservAR.backreservar.model.TableEntity;
 import com.reservAR.backreservar.service.impl.TableEntityService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class TableEntityController {
     }
 
     @PostMapping
-    public ResponseEntity<TableResponseDto> create(@RequestBody TableRequestDto tableRequestDto){
+    public ResponseEntity<TableResponseDto> create(@Valid @RequestBody TableRequestDto tableRequestDto){
         TableEntity table = tableEntityService.save(tableRequestDto);
         var location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

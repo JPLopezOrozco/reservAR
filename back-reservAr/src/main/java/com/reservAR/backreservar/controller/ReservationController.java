@@ -4,6 +4,7 @@ import com.reservAR.backreservar.dto.ReservationRequestDto;
 import com.reservAR.backreservar.dto.ReservationResponseDto;
 import com.reservAR.backreservar.model.Reservation;
 import com.reservAR.backreservar.service.IReservationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +29,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponseDto> create(@RequestBody ReservationRequestDto reservationRequestDto){
+    public ResponseEntity<ReservationResponseDto> create(@RequestBody @Valid ReservationRequestDto reservationRequestDto){
         Reservation reservation = reservationService.save(reservationRequestDto);
         var location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -39,9 +40,9 @@ public class ReservationController {
         return ResponseEntity.created(location).body(ReservationResponseDto.of(reservation));
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<List<ReservationResponseDto>> findByUser(@PathVariable Long id){
-        List<ReservationResponseDto> reservation = reservationService.findByUser(id).stream()
+    @GetMapping("/user")
+    public ResponseEntity<List<ReservationResponseDto>> findByUser(@RequestParam String username){
+        List<ReservationResponseDto> reservation = reservationService.findByUser(username).stream()
                 .map(ReservationResponseDto::of)
                 .toList();
         return ResponseEntity.ok(reservation);

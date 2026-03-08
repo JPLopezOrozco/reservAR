@@ -16,7 +16,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     boolean existsByNameAndAddressAndCityIgnoreCaseAndIdNot(String name, String address, String city, Long id);
 
     @Query("""
-        select r.id
+        select r
         from Availability a
         join Restaurant r on r.id = a.restaurant.id
         where a.dayOfWeek = :dayOfWeek

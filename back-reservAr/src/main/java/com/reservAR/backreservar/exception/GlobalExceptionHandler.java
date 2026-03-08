@@ -172,6 +172,55 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ProblemDetail handleReservationNotFoundException(HttpServletRequest rq, ReservationNotFoundException e) {
+        return problem(
+                HttpStatus.NOT_FOUND,
+                "Reservation not found",
+                e.getMessage(),
+                "urn:problem:ReservationNotFoundException",
+                rq.getRequestURI(),
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(ReservationStatusException.class)
+    public ProblemDetail handleReservationStatusException(HttpServletRequest rq, ReservationStatusException e) {
+        return problem(
+                HttpStatus.BAD_REQUEST,
+                "Reservation Problem",
+                e.getMessage(),
+                "urn:problem:ReservationProblem",
+                rq.getRequestURI(),
+                e.getMessage()
+        );
+    }
+
+
+    @ExceptionHandler(PaymentNotException.class)
+    public ProblemDetail handlePaymentNotFoundException(HttpServletRequest rq, ReservationNotFoundException e) {
+        return problem(
+                HttpStatus.NOT_FOUND,
+                "Payment not found",
+                e.getMessage(),
+                "urn:problem:PaymentNotFoundException",
+                rq.getRequestURI(),
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ProblemDetail handlePaymentException(HttpServletRequest rq, ReservationStatusException e) {
+        return problem(
+                HttpStatus.BAD_REQUEST,
+                "Payment Problem",
+                e.getMessage(),
+                "urn:problem:PaymentProblem",
+                rq.getRequestURI(),
+                e.getMessage()
+        );
+    }
+
 
 
 

@@ -29,4 +29,8 @@ public class PaymentIntent {
     @Column(length=3, nullable=false)
     private PaymentStatus status;
     private String externalId;
+    private String externalReference;
+    private String preferenceId;
+    private String paymentProviderId;
+    private String initPoint;
 }

@@ -20,6 +20,10 @@ spring:
 jwt:
   secret: JB46vDu8MzAJh0s+HEmj2EtegRs/EJJ1i9EVP48j6Hc=
 
+mercado-pago:
+  access-token: APP_USR-5631774668529393-102316-efa56a3acc039021ad8a03ca7f229df7-2943677250
+  webhook-url: https://macrometeorological-supervastly-larissa.ngrok-free.dev/payment/mercado-pago/webhook
+
 server:
   port: 8080
 

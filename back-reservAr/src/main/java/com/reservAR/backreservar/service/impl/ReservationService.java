@@ -1,16 +1,20 @@
 package com.reservAR.backreservar.service.impl;
 
+import com.reservAR.backreservar.dto.ReservationNotifyDto;
 import com.reservAR.backreservar.dto.ReservationRequestDto;
 import com.reservAR.backreservar.exception.*;
 import com.reservAR.backreservar.model.*;
 import com.reservAR.backreservar.repository.*;
 import com.reservAR.backreservar.service.IReservationService;
+import com.reservAR.backreservar.websocket.ReservationNotifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 
 import java.time.*;
 import java.util.List;
@@ -26,6 +30,7 @@ public class ReservationService implements IReservationService {
     private final TableEntityRepository tableEntityRepository;
     private final UserRepository userRepository;
     private final AvailabilityRepository availabilityRepository;
+    private final ReservationNotifier notifier;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,8 +65,6 @@ public class ReservationService implements IReservationService {
         Instant startCheck = start.minus(Duration.ofMinutes(rule.getPrepBufferMin()));
         Instant endCheck = end.plus(Duration.ofMinutes(rule.getCleanupBufferMin()));
 
-
-
         TableEntity table = tableEntityRepository
                 .findFreeTablesByRestaurant(reservation.restaurantId(), startCheck, endCheck).stream()
                 .filter((t-> t.getMaxCapacity() >= reservation.partySize() && t.getMinCapacity() <= reservation.partySize()))
@@ -77,13 +80,22 @@ public class ReservationService implements IReservationService {
                 .tables(List.of(table))
                 .build();
 
-        return reservationRepository.save(newReservation);
+        reservationRepository.save(newReservation);
+
+        notifier.notifyRestaurant(newReservation.getRestaurant().getId(),
+                newReservation.getStart(),
+                new ReservationNotifyDto("CREATED",
+                        newReservation.getId(),
+                        newReservation.getStatus().name(),
+                        newReservation.getStart()));
+
+        return newReservation;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> findByUser(Long id) {
-        User user = userRepository.findById(id)
+    public List<Reservation> findByUser(String username) {
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(()->new UserNotFoundException("User not found"));
         return reservationRepository.findAllByUser(user);
     }
@@ -96,7 +108,16 @@ public class ReservationService implements IReservationService {
 
         if (reservation.getStatus() == (Status.BOOKED)) {
             reservation.setStatus(Status.CANCELLED);
-            return reservationRepository.save(reservation);
+            Reservation reservationCancelled = reservationRepository.save(reservation);
+            notifier.notifyRestaurant(
+                    reservationCancelled.getRestaurant().getId(),
+                    reservationCancelled.getStart(),
+                    new ReservationNotifyDto("CANCELLED",
+                            reservationCancelled.getRestaurant().getId(),
+                            reservationCancelled.getStatus().name(),
+                            reservationCancelled.getStart())
+                    );
+            return reservationCancelled;
         }else {
             throw new ReservationStatusException("Reservation is not booked");
         }
@@ -110,7 +131,17 @@ public class ReservationService implements IReservationService {
 
         if (reservation.getStatus() == (Status.BOOKED)) {
             reservation.setStatus(Status.COMPLETED);
-            return reservationRepository.save(reservation);
+            Reservation reservationCompleted = reservationRepository.save(reservation);
+            notifier.notifyRestaurant(
+                    reservationCompleted.getRestaurant().getId(),
+                    reservationCompleted.getStart(),
+                    new ReservationNotifyDto("COMPLETED",
+                            reservationCompleted.getRestaurant().getId(),
+                            reservationCompleted.getStatus().name(),
+                            reservationCompleted.getStart())
+            );
+
+            return reservationCompleted;
         }else {
             throw new ReservationStatusException("Reservation is not booked");
         }
@@ -161,10 +192,20 @@ public class ReservationService implements IReservationService {
                         if (!expiredReservations.isEmpty()) {
                             expiredReservations.forEach(reservation -> {
                                 reservation.setStatus(Status.EXPIRED);
+                                reservationRepository.save(reservation);
+                                notifier.notifyRestaurant(
+                                        reservation.getRestaurant().getId(),
+                                        reservation.getStart(),
+                                        new ReservationNotifyDto("EXPIRED",
+                                                reservation.getRestaurant().getId(),
+                                                reservation.getStatus().name(),
+                                                reservation.getStart())
+                                );
                             });
-                            reservationRepository.saveAll(expiredReservations);
                             log.info("Expired {} reservations for restaurant {}", expiredReservations.size(), restaurant.getName());
+
                         }
+
 
                     }catch (Exception e) {
                         log.warn("Error expiring reservations for restaurant {}: {}", restaurant.getName(), e.getMessage());
