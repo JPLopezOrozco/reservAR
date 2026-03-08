@@ -12,7 +12,6 @@ import java.util.List;
 
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
-    boolean existsByNameAndAddressAndCityIgnoreCase(String name, String address, String city);
     boolean existsByNameAndAddressAndCityIgnoreCaseAndIdNot(String name, String address, String city, Long id);
 
     @Query("""

@@ -2,7 +2,6 @@ package com.reservAR.backreservar.controller;
 
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
-import com.reservAR.backreservar.dto.PaymentDto;
 import com.reservAR.backreservar.service.IPaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

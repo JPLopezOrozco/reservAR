@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .authenticationManager(authenticationManager)
                 .addFilterBefore(rateLimiterFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-        ;
+
         return http.build();
     }
 
@@ -58,7 +58,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(CustomUserDetailsService userDetailsService, PasswordEncoder encoder) throws Exception {
+    public AuthenticationManager authenticationManager(CustomUserDetailsService userDetailsService, PasswordEncoder encoder){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(encoder);
         return new ProviderManager(authProvider);

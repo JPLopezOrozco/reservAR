@@ -9,12 +9,10 @@ import com.reservAR.backreservar.service.IReservationService;
 import com.reservAR.backreservar.websocket.ReservationNotifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 
 import java.time.*;
 import java.util.List;

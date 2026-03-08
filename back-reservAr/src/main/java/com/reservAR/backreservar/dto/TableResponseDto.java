@@ -1,7 +1,6 @@
 package com.reservAR.backreservar.dto;
 
 import com.reservAR.backreservar.model.TableEntity;
-import jakarta.persistence.Table;
 
 public record TableResponseDto(
         Long restaurantId,

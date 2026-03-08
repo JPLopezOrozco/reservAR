@@ -40,7 +40,7 @@ public class RateLimiterFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String ip = getClientIp(request);
 
-        if ("auth/user/login".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) {
+        if ("/auth/user/login".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) {
             Bucket bucket = buckets.computeIfAbsent("login:" + ip, key -> newBucketForLogin());
 
             if (!bucket.tryConsume(1)){
@@ -53,7 +53,7 @@ public class RateLimiterFilter extends OncePerRequestFilter {
             }
         }
 
-        if ("/reservations".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) {
+        if ("/reservation".equals(path) && "POST".equalsIgnoreCase(request.getMethod())) {
             Bucket bucket = buckets.computeIfAbsent("reservation:" + ip, key -> newBucketForLogin());
 
             if (!bucket.tryConsume(1)){

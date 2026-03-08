@@ -103,8 +103,8 @@ public class PaymentService implements IPaymentService {
 
             return preference.getSandboxInitPoint();
         } catch (MPApiException e) {
-            log.error("MP status code" + e.getStatusCode());
-            log.error("MP content" + e.getApiResponse().getContent());
+            log.error("MP status code{}", e.getStatusCode());
+            log.error("MP content{}", e.getApiResponse().getContent());
             throw e;
         }
     }
@@ -162,7 +162,7 @@ public class PaymentService implements IPaymentService {
                         reservation.getStart()
                 );
 
-                notifier.notifyRestaurant(reservation.getId(), reservation.getStart(), event);
+                notifier.notifyRestaurant(reservation.getRestaurant().getId(), reservation.getStart(), event);
             }
         }else if ("rejected".equals(payment.getStatus())) {
             paymentIntent.setStatus(PaymentStatus.FAILED);
