@@ -13,8 +13,26 @@ services:
       retries: 10
     volumes:
       - reservar-db:/var/lib/postgresql/data
+    networks:
+      - reservar
     ports:
       - "5433:5432"
+  reservar-app:
+    build:
+      context: ./back-reservAr
+      dockerfile: Dockerfile
+    container_name: reservar_app
+    restart: on-failure
+    depends_on:
+      reservar-db:
+        condition: service_healthy
+    networks:
+      - reservar
+    ports:
+      - "8080:8080"
 
 volumes:
   reservar-db:
+
+networks:
+  reservar:
