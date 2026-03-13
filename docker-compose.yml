@@ -3,9 +3,9 @@ services:
     image: postgres:16
     container_name: reservar_db
     environment:
-      POSTGRES_DB: reservar_db
-      POSTGRES_USER: reservar_user
-      POSTGRES_PASSWORD: 123456789
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U reservar_user -d reservar_db" ]
       interval: 5s
@@ -26,6 +26,13 @@ services:
     depends_on:
       reservar-db:
         condition: service_healthy
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MERCADO-PAGO_TOKEN: ${MERCADO-PAGO_TOKEN}
+      MERCADO-PAGO_WEBHOOK_URL: ${MERCADO-PAGO_WEBHOOK_URL}
+      SPRING_DATASOURCE_URL: ${RESERVAR_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${RESERVAR_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${RESERVAR_DATASOURCE_PASSWORD}
     networks:
       - reservar
     ports:

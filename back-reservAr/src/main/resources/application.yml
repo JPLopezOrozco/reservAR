@@ -2,9 +2,9 @@ spring:
   application:
     name: back-reservAR
   datasource:
-    url: jdbc:postgresql://reservar_db:5432/reservar_db
-    username: reservar_user
-    password: 123456789
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true
@@ -17,14 +17,12 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
-# secret de prueba, se recomienda cambiarlo
 jwt:
-  secret: JB46vDu8MzAJh0s+HEmj2EtegRs/EJJ1i9EVP48j6Hc=
+  secret: ${JWT_SECRET}
 
-# token y url de prueba de mp
 mercado-pago:
-  access-token: APP_USR-5631774668529393-102316-efa56a3acc039021ad8a03ca7f229df7-2943677250
-  webhook-url: https://macrometeorological-supervastly-larissa.ngrok-free.dev/payment/mercado-pago/webhook
+  access-token: ${MERCADO-PAGO_TOKEN}
+  webhook-url: ${MERCADO-PAGO_WEBHOOK_URL}
 
 server:
   port: 8080

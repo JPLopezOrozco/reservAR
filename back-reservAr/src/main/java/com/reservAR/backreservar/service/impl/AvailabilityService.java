@@ -45,7 +45,7 @@ public class AvailabilityService implements IAvailabilityService {
     public Availability save(AvailabilityRequestDto availability) {
         DayOfWeek day = DayOfWeek
                 .valueOf(availability
-                        .DayOfWeek()
+                        .dayOfWeek()
                         .trim()
                         .toUpperCase(Locale.ROOT));
 

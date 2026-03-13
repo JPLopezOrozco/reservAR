@@ -3,6 +3,7 @@ package com.reservAR.backreservar.controller;
 import com.reservAR.backreservar.dto.TableRequestDto;
 import com.reservAR.backreservar.dto.TableResponseDto;
 import com.reservAR.backreservar.model.TableEntity;
+import com.reservAR.backreservar.service.ITableEntityService;
 import com.reservAR.backreservar.service.impl.TableEntityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TableEntityController {
 
-    private final TableEntityService tableEntityService;
+    private final ITableEntityService tableEntityService;
 
     @GetMapping("/id/{id}")
     public ResponseEntity<TableResponseDto> findById(@PathVariable Long id){
