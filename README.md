@@ -1,190 +1,207 @@
-# ReservAr - Backend
+# ReservAr — Restaurant Reservation API
 
-## Descripción
+A production-ready REST API for managing restaurant reservations, built with Spring Boot. Supports real-time notifications via WebSocket/STOMP, payment processing through MercadoPago, and rate limiting with Bucket4j.
 
-**ReservAr** es una API REST desarrollada con **Spring Boot** para
-gestionar reservas en restaurantes.
+---
 
-El sistema permite: - Registrar usuarios y autenticarlos mediante
-**JWT** - Gestionar restaurantes - Definir disponibilidad de
-restaurantes - Administrar mesas - Crear y gestionar reservas - Procesar
-pagos mediante **Mercado Pago** - Notificar cambios de reservas mediante
-**WebSocket**
+## Quick Start
 
-La aplicación utiliza **PostgreSQL** como base de datos y **Flyway**
-para las migraciones.
-
-------------------------------------------------------------------------
-
-# Quick Start
-
-Levantar todo el proyecto con un solo comando:
-
+```bash
+git clone https://github.com/JPLopezOrozco/reservAR.git
+cd reservAR
+cp .env.example .env   # fill in your values
 docker compose up --build
+```
 
-La API quedará disponible en:
+API available at `http://localhost:8080`
 
-http://localhost:8080
+> PostgreSQL starts first with a healthcheck. The app waits until the database is ready — no race conditions on startup.
 
-------------------------------------------------------------------------
+---
 
-# Tecnologías utilizadas
+## Tech Stack
 
--   Java
--   Spring Boot
--   Spring Security
--   JWT Authentication
--   PostgreSQL
--   Flyway
--   Docker
--   Docker Compose
--   Mercado Pago SDK
--   WebSocket (STOMP)
--   Bucket4j (Rate Limiting)
+| Layer | Technology |
+|---|---|
+| Framework | Spring Boot 3, Spring Security |
+| Auth | JWT (custom) + BCrypt |
+| Database | PostgreSQL 16 + Flyway |
+| Real-time | WebSocket / STOMP |
+| Payments | MercadoPago SDK |
+| Rate limiting | Bucket4j |
+| Containerization | Docker + Docker Compose |
 
-------------------------------------------------------------------------
+---
 
-# Arquitectura
+## Environment Variables
 
-El proyecto sigue una arquitectura en capas:
+Create a `.env` file in the root directory based on this template:
 
-Controller → Endpoints REST\
-Service → Lógica de negocio\
-Repository → Acceso a base de datos\
-DTO → Transferencia de datos\
-Model → Entidades JPA
+```env
+# PostgreSQL
+POSTGRES_DB=reservar_db
+POSTGRES_USER=reservar_user
+POSTGRES_PASSWORD=your_password_here
 
-------------------------------------------------------------------------
+# Datasource (used by the Spring app inside Docker)
+RESERVAR_DATASOURCE_URL=jdbc:postgresql://reservar-db:5432/reservar_db
+RESERVAR_DATASOURCE_USERNAME=reservar_user
+RESERVAR_DATASOURCE_PASSWORD=your_password_here
 
-# Infraestructura con Docker
+# JWT
+JWT_SECRET=your_jwt_secret_min_32_characters
 
-El proyecto está completamente dockerizado utilizando **Docker** y
-**Docker Compose**.
+# MercadoPago
+MERCADO-PAGO_TOKEN=your_mercadopago_access_token
+MERCADO-PAGO_WEBHOOK_URL=https://your-domain.com/payment/mercado-pago/webhook
+```
 
-La infraestructura levanta automáticamente:
+> Never commit your `.env` file. It is already listed in `.gitignore`.
 
--   Backend Spring Boot
--   Base de datos PostgreSQL
--   Red Docker dedicada
--   Volumen persistente para datos
+---
 
-------------------------------------------------------------------------
+## API Endpoints
 
-# Servicios Docker
+### Auth — `/auth`
 
-## Backend (reservar-app)
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| POST | `/auth/user` | Register customer | No |
+| POST | `/auth/staff` | Register staff | No |
+| POST | `/auth/user/login` | Login | No |
+| GET | `/auth/id/{id}` | Get user by ID | Yes |
 
-API REST que gestiona:
+### Restaurants — `/restaurants`
 
--   usuarios
--   restaurantes
--   mesas
--   reservas
--   pagos
--   notificaciones en tiempo real
+| Method | Path | Description |
+|---|---|---|
+| GET | `/restaurants` | List all restaurants |
+| GET | `/restaurants/id/{id}` | Get by ID |
+| POST | `/restaurants` | Create restaurant |
+| PUT | `/restaurants/update/{id}` | Update restaurant |
+| PATCH | `/restaurants/price/{id}` | Update price |
 
-Puerto expuesto:
+### Tables — `/table`
 
-8080
+| Method | Path | Description |
+|---|---|---|
+| GET | `/table/id/{id}` | Get by ID |
+| GET | `/table/restaurant/{id}` | Get tables by restaurant |
+| POST | `/table` | Create table |
+| DELETE | `/table/delete/{id}` | Delete table |
 
-------------------------------------------------------------------------
+### Availability — `/availability`
 
-## Base de datos (reservar-db)
+| Method | Path | Description |
+|---|---|---|
+| GET | `/availability/id/{id}` | Get by ID |
+| GET | `/availability/restaurant/{id}` | Get by restaurant |
+| POST | `/availability` | Create slot |
+| DELETE | `/availability/delete/{id}` | Delete slot |
 
-Contenedor PostgreSQL 16.
+`dayOfWeek` accepts: `MONDAY` `TUESDAY` `WEDNESDAY` `THURSDAY` `FRIDAY` `SATURDAY` `SUNDAY`
 
-Configuración:
+### Inventory Rules — `/rule`
 
-DB: reservar_db\
-USER: reservar_user\
-PASSWORD: 123456789\
-PORT: 5433
+| Method | Path | Description |
+|---|---|---|
+| GET | `/rule/id/{id}` | Get by ID |
+| GET | `/rule` | List all |
+| POST | `/rule` | Create rule |
+| DELETE | `/rule/delete/{id}` | Delete rule |
 
-Características:
+### Reservations — `/reservation`
 
--   Healthcheck usando pg_isready
--   Volumen persistente para los datos
--   Red Docker dedicada
+| Method | Path | Description |
+|---|---|---|
+| GET | `/reservation/id/{id}` | Get by ID |
+| GET | `/reservation/user` | Get for authenticated user |
+| POST | `/reservation` | Create reservation |
+| PUT | `/reservation/cancel/{id}` | Cancel reservation |
+| PUT | `/reservation/completedReservation/{id}` | Mark as completed |
 
-------------------------------------------------------------------------
+### Payments — `/payment`
 
-# Ejecutar el proyecto
+| Method | Path | Description |
+|---|---|---|
+| POST | `/payment/mercado-pago/{id}` | Initiate payment |
+| POST | `/payment/mercado-pago/webhook` | Webhook handler |
 
-1.  Clonar repositorio
+---
 
-git clone `https://github.com/JPLopezOrozco/reservAR.git`
+## Security
 
-2.  Levantar infraestructura
+All endpoints require a Bearer token except:
 
-docker compose up --build
+```
+/auth/**
+/payment/mercado-pago/webhook
+```
 
-Esto iniciará:
+Authenticated requests:
 
--   PostgreSQL
--   Backend Spring Boot
+```http
+Authorization: Bearer <token>
+```
 
-3.  Detener servicios
+Passwords are hashed with BCrypt. Rate limiting is applied per IP with Bucket4j.
 
-docker compose down
+---
 
-------------------------------------------------------------------------
+## Real-time Notifications
 
-# Base de datos
+Connect via SockJS + STOMP to receive live reservation events:
 
-Las migraciones se gestionan con **Flyway**.
+```javascript
+const socket = new SockJS('http://localhost:8080/ws');
+const client = Stomp.over(socket);
 
-Ubicación:
+client.connect({}, () => {
+  client.subscribe('/topic/reservations', (message) => {
+    const event = JSON.parse(message.body);
+    console.log(event);
+  });
+});
+```
 
-src/main/resources/db/migration
+---
 
-Las migraciones se ejecutan automáticamente al iniciar la aplicación.
+## Database Migrations
 
-------------------------------------------------------------------------
+Flyway runs migrations automatically on startup.
 
-# Seguridad
+```
+src/main/resources/db/migration/
+├── V1__create_user_table.sql
+├── V2__create_tables.sql
+└── ...
+```
 
-El sistema utiliza:
+---
 
--   Spring Security
--   JWT Authentication
--   BCrypt para contraseñas
--   Rate limiting con Bucket4j
+## Project Structure
 
-Endpoints públicos:
+```
+src/main/java/com/reservAR/backreservar/
+├── config/       # Security, WebSocket, Jackson, rate limiter
+├── controller/   # REST controllers
+├── dto/          # Request / Response DTOs
+├── exception/    # Custom exceptions + GlobalExceptionHandler
+├── jwt/          # JwtFilter + JwtService
+├── model/        # JPA entities
+├── repository/   # Spring Data JPA repositories
+└── service/      # Interfaces + implementations
+```
 
-/auth/\*\* /payment/mercado-pago/webhook
+---
 
-El resto requiere autenticación:
+## Tests
 
-Authorization: Bearer TOKEN
+```bash
+./mvnw test
+```
 
-------------------------------------------------------------------------
+Coverage includes: Controllers · Services · JWT · Rate Limiter
 
-# WebSockets
-
-Endpoint:
-
-/ws
-
-Broker:
-
-/topic
-
-Se utiliza para enviar notificaciones de cambios en reservas.
-
-------------------------------------------------------------------------
-
-# Tests
-
-El proyecto incluye tests para:
-
--   Controllers
--   Services
--   JWT
--   Rate Limiter
-
-Ubicación:
-
-src/test/java
-
+Tests use `@WebMvcTest` with mocked dependencies — no database required.
 
